@@ -6,7 +6,7 @@ function [ summary ] = tensorDenoiseUnfoldingCV( Y, options )
   %% set defaults for options structure
   if nargin < 2
     options = struct; end
-  if ~isfield(options,'maxr');
+  if ~isfield(options,'r_range');
     options.r_range = 2:10; end
   if ~isfield(options, 'resampleTrials'); % for mixing up trial counts
     options.resample = 0; end

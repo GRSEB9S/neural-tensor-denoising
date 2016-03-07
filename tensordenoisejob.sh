@@ -5,7 +5,7 @@
 #$ -N tensorDenoising
 #$ -j y
 #$ -m ea # send email at end of job and if aborted
-#$ -t 1-3
+#$ -t 1-240
 
 ## Some Debugging info
 echo "Your UNI: $USER"
@@ -20,7 +20,5 @@ echo "Your email: $jss2219@cumc.columbia.edu"
 cd /ifs/scratch/zmbbi/la_lab/jss2219/
 
 #The following is the job to be performed:
-/nfs/apps/matlab/2015a/bin/matlab -singleCompThread -nojvm -nodisplay -nosplash -r '/ifs/scratch/zmbbi/la_lab/jss2219/tensorDenoiseFiguresCluster($SGE_TASK_ID); quit force'
-
-
+/nfs/apps/matlab/2015a/bin/matlab -singleCompThread -nojvm -nodisplay -nosplash -r '/ifs/scratch/zmbbi/la_lab/jss2219/tensorDenoiseCluster($SGE_TASK_ID)'
 
