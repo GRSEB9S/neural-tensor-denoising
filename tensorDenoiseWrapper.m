@@ -5,6 +5,13 @@ if nargin < 6
   datpath = 'dat-files/';
 end
 
+options = [];
+options.gridStep = 3;
+options.minRank = [20 2 2];
+options.maxRank = [80 20 20];
+options.resample = 1;
+options.verbose = 1;
+
 options.r1 = r1;
 options.method = method;
 options.rng_iter = rng_iter;
