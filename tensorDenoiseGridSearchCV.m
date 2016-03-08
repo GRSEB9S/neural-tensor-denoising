@@ -95,6 +95,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   summary.core_elts = core_elts(out);
   summary.core_sum = core_sum(out);
   summary.err = err_avg;  
+  summary.minind = minind;
   summary.minrank = minrank;
   summary.options = options;
   
