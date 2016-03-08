@@ -6,21 +6,35 @@ files = dir(datpath);
 files = files(~[files.isdir]);
 n = length(files);
 
-for nn = 1:n
-  rng_iter = str2num(files(nn).name(?));
-  trial = str2num(files(nn).name(?));
-  method = str2num(files(nn).name(?));
-  dataset = str2num(files(nn).name(?));
-  
-  dat = readtable([datpath files(nn).name]);
-  
-  minrank = dat{1,{'minrank_1', 'minrank_2', 'minrank_3'}};
-  err = dat{:,'err'};
-  ranks = dat{:,{'ranks_1','ranks_2','ranks_3'}};
-  minidx = find(ismember(ranks,minrank,'rows')==1);
-  
-  errPlot(dataset).method(method+1).err(trial-1,1) = err(minidx); % use cell instead? pad/initialize with nans in case rows/cols don't match up
-  
-end
+load('mat-files/Data.mat');
+load('mat-files/DataSim.mat');
+load('mat-files/DataMatched.mat');
 
+% initialize errPlot with nans/ []'s
+
+for nn = 1:n
+  load([datpath files(nn).name]);
+  
+  Yest = table_out.Properties.UserData.Yest;
+  dataset = table_out.Properties.UserData.dataset;
+  
+  rng_iter = str2double(files(nn).name(5:7));
+  trial = str2double(files(nn).name(9:11));
+  method = str2double(files(nn).name(13));
+  dataset = str2double(files(nn).name(15));
+
+  switch dataset
+    case 1
+      Ygt = Data.Ysm_;
+    case 2
+      Ygt = DataSim.Ygt;
+    case 3
+      Ygt = DataMatched.Ysm_;
+  end
+  
+  err = norm(Ygt(:) - Yest(:)).^2/Ygt(:).^2;
+  
+  errPlot{dataset}{rng_iter}(method+1,trial-1) = err;
+    
+end
 end

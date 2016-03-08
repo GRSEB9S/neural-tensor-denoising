@@ -5,13 +5,6 @@ if nargin < 6
   datpath = 'dat-files/';
 end
 
-options = [];
-options.gridStep = 2;
-options.minRank = [20 2 2];
-options.maxRank = [80 20 20];
-options.resample = 1;
-options.verbose = 1;
-
 options.r1 = r1;
 options.method = method;
 options.rng_iter = rng_iter;
@@ -19,7 +12,6 @@ options.rng_iter = rng_iter;
 summary = tensorDenoiseGridSearchCV(Y, options);
 
 %% write summary to file
-L = length(summary.err);
 
 % remove model complexity data for now.
 table_out = struct2table(rmfield(summary,{'options','model_elts','core_elts','core_sum','minind','minrank'}));
@@ -30,7 +22,7 @@ table_out.Properties.UserData.method = method;
 table_out.Properties.UserData.rng_iter = rng_iter;
 table_out.Properties.UserData.minrank = summary.minrank;
 table_out.Properties.UserData.minind = summary.minind;
-table_out.Properties.UserData.Ynorm = norm(Y(:).^2);
+%table_out.Properties.UserData.Ynorm = norm(Y(:)).^2; % handle nans???
 
 filename = [datpath 'dat-' num2str(rng_iter, '%03d') '-' num2str(r1, '%03d') '-' num2str(method) '-' num2str(dataset)];
 save(filename, 'table_out'); 

@@ -81,54 +81,65 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
     Yval = Ys(:,:,:,r2);
     for ii = 1:size(out,1)     
       % compute error:
-      err(ii,r2) = tensorDenoiseERR( Yval, tensorDenoiseSVD(mean(Ytrain, 4, 'omitnan'), out(ii,:)), erroptions );        
+      Yhat = tensorDenoiseSVD(mean(Ytrain, 4, 'omitnan'), out(ii,:));
+      err(ii,r2) = tensorDenoiseERR( Yval, Yhat, erroptions );
     end
   end
   err_avg = mean(err,2);
   % get mins
+  
+  %% optimal model -- lots to do
+  [p_out, p_complexity, p_err_avg] = pareto(out, core_elts);
+  
+  % search through possible slope values:
+  % f(x) - mx. find min for different choices of m.
+  
   minind = find(err_avg == min(err_avg),1);
   minrank = out(minind,:);
   
-  %% output
-  summary.ranks = out;    
+  Yest = tensorDenoiseSVD(Ysm, minrank);
+  
+  %% output -- to do
+  summary.ranks = out;
   summary.model_elts = model_elts(out);
   summary.core_elts = core_elts(out);
   summary.core_sum = core_sum(out);
-  summary.err = err_avg;  
+  summary.err = err_avg;
+  summary.p_err = p_err_avg;
+  summary.p_complexity = p_complexity;
+  summary.p_ranks = p_out;
   summary.minind = minind;
   summary.minrank = minrank;
+  summary.Yest = Yest;
   summary.options = options;
   
   %% function not ready -- pareto optimal ranks
-  function [ranks,x,y] = pareto(out, coreMeasure)
+  function [rnks,x,y] = pareto(rnks, coreMeasure)
     %% pareto optimal
-    out_old = out;
-    for r1 = 2:r_range
-      out = out_old;
-      x = mem(out);
-      y = err_summary.mse_avg(:,r1-1);
+    x = coreMeasure(rnks);
+    y = err_avg;
 
-      d = sqrt(x.^2+y.^2);
-      [d,idx] = sort(d);
-      out = out(idx,:);
-      x = x(idx);
-      y = y(idx);
+    d = sqrt(x.^2+y.^2);
+    [d,idx] = sort(d);
+    rnks = rnks(idx,:);
+    x = x(idx);
+    y = y(idx);
 
-      p = 1;
-      while sum(p) <= length(x) % originally it was ~=. now it is <=
-          idx = (x >= x(p) & y > y(p)) | (x > x(p) & y >= y(p));
-          if any(idx)
-              out = out(~idx,:); x = x(~idx); y = y(~idx); d = d(~idx);
-          end
-          p = p+1-sum(idx(1:p));
-      end
-      [~,idx] = sortrows([mem(out) -y]);
-      out = out(idx,:); x = x(idx); y = y(idx);
+    p = 1;
+    while sum(p) <= length(x) % originally it was ~=. now it is <=
+        idx = (x >= x(p) & y > y(p)) | (x > x(p) & y >= y(p));
+        if any(idx)
+            rnks = rnks(~idx,:); x = x(~idx); y = y(~idx); d = d(~idx);
+        end
+        p = p+1-sum(idx(1:p));
     end
+    [~,idx] = sortrows([coreMeasure(rnks) -y]);
+    rnks = rnks(idx,:); x = x(idx); y = y(idx);
   end
 
   %% resample trials
-  % to do
+  % to do:
+  % separate into different function.
   function Yout = resampleTrials( Yin, repl )
       trialCount = getTrialCount(Yin);
       for nn = 1:n;
