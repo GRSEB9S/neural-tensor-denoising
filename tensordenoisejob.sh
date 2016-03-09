@@ -5,7 +5,9 @@
 #$ -N tensorDenoising
 #$ -j y
 #$ -m ea # send email at end of job and if aborted
-#$ -t 1-320
+#$ -t 1-800
+#$ -o /ifs/scratch/zmbbi/la_lab/jss2219/sge-output/
+#$ -e /ifs/scratch/zmbbi/la_lab/jss2219/sge-error/
 
 ## Some Debugging info
 echo "Your UNI: $USER"
@@ -17,5 +19,5 @@ echo “Current job name : $JOB_NAME”
 # echo "Your email: $USER@c2b2.columbia.edu"
 
 #The following is the job to be performed:
-/nfs/apps/matlab/2015a/bin/matlab -singleCompThread -nojvm -nodisplay -nosplash -r 'tensorDenoiseCluster($SGE_TASK_ID)' >matoutfile$SGE_TASK_ID
+/nfs/apps/matlab/2015a/bin/matlab -singleCompThread -nojvm -nodisplay -nosplash -r 'tensorDenoiseCluster($SGE_TASK_ID)' >/ifs/scratch/zmbbi/la_lab/jss2219/mat-outfile/matoutfile$SGE_TASK_ID
 

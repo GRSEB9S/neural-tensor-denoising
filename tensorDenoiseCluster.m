@@ -9,7 +9,7 @@ addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
 n_data = 2;
 n_methods = 4;
 n_trialcount = 10;
-n_iter = 4;
+n_iter = 10;
 
 n_vec = [n_iter, n_trialcount, n_methods, n_data];
 

@@ -69,7 +69,6 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
 
   % replacement?
   if resample
-    rng(r1+1000*rng_iter);
     Ys = resampleTrials(Y, 1);
   end
   
@@ -141,6 +140,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   % to do:
   % separate into different function.
   function Yout = resampleTrials( Yin, repl )
+      rng(r1+1000*rng_iter);
       trialCount = getTrialCount(Yin);
       for nn = 1:n;
         for cc = 1:c
