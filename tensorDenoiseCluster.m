@@ -2,7 +2,7 @@ function tensorDenoiseCluster(index)
 % generate figure 2 data. for hpc cluster.
 
 cd /ifs/scratch/zmbbi/la_lab/jss2219/
-datpath = 'dat-file-3-8-16/';
+datpath = 'dat-file-3-9-16/';
 mkdir(datpath);
 addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
 
@@ -10,6 +10,13 @@ n_data = 2;
 n_methods = 4;
 n_trialcount = 10;
 n_iter = 10;
+
+%% debug
+n_data = 1;
+n_methods = 1;
+n_trialcount = 1;
+n_iter = 3;
+%% /debug
 
 n_vec = [n_iter, n_trialcount, n_methods, n_data];
 
