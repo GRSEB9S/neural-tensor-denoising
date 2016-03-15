@@ -57,7 +57,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
 
   %% error options
   erroptions = struct;
-  erroptions.threshold = 0; % usually set to 1
+  erroptions.threshold = 1; % usually set to 1
   erroptions.perNeuron = 0;
   
   if verbose;
@@ -69,6 +69,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   end
   
   err = zeros(size(out,1), r1);
+  
   for r2 = 1:r1
     if verbose; disp([num2str(r2) ' / ' num2str(r1)]); end
     Ytrain = Ys(:,:,:,1:r1);

@@ -17,7 +17,7 @@ function [ err, err2 ] = tensorDenoiseERR( Y, Yhat, options )
   perNeuron = options.perNeuron;
   threshold = options.threshold;
 
-  %% threshold data?
+  %% threshold data before computing error?
   if threshold
     Yhat = Yhat.*(Yhat>0);
   end
@@ -26,9 +26,9 @@ function [ err, err2 ] = tensorDenoiseERR( Y, Yhat, options )
   Y = Y(:,:);
   Yhat = Yhat(:,:);
   if ~perNeuron    
-    err = norm(Y(:)-Yhat(:))^2;%/norm(Y(:))^2);
+    err = 1/length(Y(:))*norm(Y(:)-Yhat(:))^2;
   else
-    err = norm(Y(:,:)-Yhat(:,:)).^2;%./norm(Y(:,:)).^2);
+    err = 1/size(Y(:,:),2)*norm(Y(:,:)-Yhat(:,:)).^2;
   end
 
   

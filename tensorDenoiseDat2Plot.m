@@ -7,9 +7,9 @@ files = dir(datpath);
 files = files(~[files.isdir]);
 n = length(files);
 
-load('mat-files/Data.mat');
-load('mat-files/DataSim.mat');
-load('mat-files/DataMatched.mat');
+load('mat-files/Data_maze.mat');
+%load('mat-files/DataSim.mat');
+%load('mat-files/DataMatched.mat');
 
 % initialize errPlot with nans/ []'s
 
@@ -77,13 +77,13 @@ for r1 = 2:maxtrial
       err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
       errPlot{1}(r1-1,5,rng_iter+1) = err;
       
-      [Ygt,mu,sig] = tensorDenoiseStandardize(DataSim.Ygt);
-      Y = bsxfun(@plus, DataSim.Ys_, -mu);
-      Y = bsxfun(@rdivide, Y, sig);
-      Y = resampleTrials(Y, 1, rng_iter);
-      Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
-      err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
-      errPlot{2}(r1-1,5,rng_iter+1) = err;
+%       [Ygt,mu,sig] = tensorDenoiseStandardize(DataSim.Ygt);
+%       Y = bsxfun(@plus, DataSim.Ys_, -mu);
+%       Y = bsxfun(@rdivide, Y, sig);
+%       Y = resampleTrials(Y, 1, rng_iter);
+%       Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
+%       err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
+%       errPlot{2}(r1-1,5,rng_iter+1) = err;
       
 %       Ygt = DataMatched.Ysm_;
 %       [Y,mu,sig] = tensorDenoiseStandardize(DataMatched.Ys_);

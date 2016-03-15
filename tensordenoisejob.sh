@@ -1,10 +1,10 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l mem=6G,time=1:00:00
+#$ -l mem=8G,time=12:00:00
 #$ -cwd
 #$ -N tensorDenoising
 #$ -j y
-#$ -t 1-800
+#$ -t 1-200
 #$ -o /ifs/scratch/zmbbi/la_lab/jss2219/sge-output/
 #$ -e /ifs/scratch/zmbbi/la_lab/jss2219/sge-error/
 

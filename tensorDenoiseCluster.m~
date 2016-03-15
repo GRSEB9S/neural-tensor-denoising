@@ -38,7 +38,7 @@ switch dataset
     tensorDenoiseWrapper(Ys_, r1, method, dataset, rng_iter, datpath);
   case 3
     load('mat-files/DataMatched.mat');
-    Ys_ = tensorDenoiseNormalize(DataMatched.Ys_);
+    Ys_ = tensorDenoiseStandardize(DataMatched.Ys_);
     tensorDenoiseWrapper(Ys_, r1, method, dataset, rng_iter, datpath);
 end
 

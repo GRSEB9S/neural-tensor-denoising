@@ -1,5 +1,9 @@
 function Yout = resampleTrials( Yin, repl, seed )
-  
+% resampleTrials.m
+% Yin - size (n,t,c,r)
+% repl - {0,1}. 1 for resampling with replacement.
+% seed - rng seed
+
   if nargin < 2
     repl = 1;
   end
