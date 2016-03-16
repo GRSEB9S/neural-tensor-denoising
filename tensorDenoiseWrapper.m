@@ -18,13 +18,7 @@ options.rng_iter = rng_iter;
 
 summary = tensorDenoiseGridSearchCV(Y, options);
 
-%% write summary to file
-
-% remove model complexity data for now.
-%table_out = struct2table(rmfield(summary,{'options','model_elts','core_elts','core_sum','minind','minrank','Y}));
-
-%uhh just save as struct? not table...
-%table_out = rmfield(summary,{'model_elts','core_sum','options'}
+%%
 table_out = summary;
 
 % provide metadata (UserData? ok)

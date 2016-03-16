@@ -1,10 +1,7 @@
-function [ Data_out ] = compressTrials2( Data )
-% converts an n x t x c x r tensor from r = total_trials to r =
-% max(trials_i/condition_i).
-% todo:
-% - output indices for method 2 n x c x t can be reconstructed;
-% - other method options -- e.g. for trial avging
-% - maybe a smoothing option.
+function [ Data_out ] = tensorizeTrials( Data )
+% tensorizeTrials( Data )
+% converts 
+% 
 
 if length(Data)==1
     structType = 1;

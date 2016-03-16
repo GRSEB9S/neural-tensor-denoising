@@ -1,9 +1,11 @@
-function [ Y_out ] = tensorDenoiseNormalize( Y_in, const )
+function [ Y_out, div ] = tensorDenoiseNormalize( Y_in, const )
 % normalize non-neagative neurons of tensor Y_in
 
   if nargin < 2
-    const = 5;
+    const = 0.5*max(Y_in(:));
   end
-  Y_out = bsxfun(@rdivide, Y_in, const + range(Y_in(:,:),2));
+  div = max(Y_in(:,:),[],2) + const;
+  Y_out = bsxfun(@rdivide, Y_in, div);
+  
 end
 

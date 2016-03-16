@@ -2,12 +2,11 @@ function tensorDenoiseDat2Plot(datpath)
 % process dat files and make a plot
 % make sure datpath includes '/' at the end
 
-
 files = dir(datpath);
 files = files(~[files.isdir]);
 n = length(files);
 
-load('mat-files/Data_maze.mat');
+load('mat-files/DataShenoy.mat');
 %load('mat-files/DataSim.mat');
 %load('mat-files/DataMatched.mat');
 
@@ -17,40 +16,19 @@ load('mat-files/Data_maze.mat');
 for nn = 1:n
   load([datpath files(nn).name]);
   
-  r1 = table_out.options.r1;
-  rng_iter = table_out.options.rng_iter;
-  minrank = table_out.minrank;
-  minrank = table_out.minrank_p(20,:);
-  
-  %dataset = table_out.dataset;
+  r1 = summary.options.r1;
+  rng_iter = summary.options.rng_iter;
+  minrank = summary.minrank;
+  %minrank = summary.minrank_p(20,:);
   
   rng_iter = str2double(files(nn).name(5:7));
   trial = str2double(files(nn).name(9:11));
   method = str2double(files(nn).name(13));
   dataset = str2double(files(nn).name(15));
 
-  switch dataset
-    case 1
-      Ygt = Data.Ysm_;
-      [Y,mu,sig] = tensorDenoiseStandardize(Data.Ys_);
-      Ygt = bsxfun(@plus, Ygt, -mu);
-      Ygt = bsxfun(@rdivide, Ygt, sig);
-      Y = resampleTrials(Y, 1, rng_iter);
-      Yest = tensorDenoiseSVD(mean(Y(:,:,:,1:r1),4,'omitnan'), minrank);
-    case 2
-      [Ygt,mu,sig] = tensorDenoiseStandardize(DataSim.Ygt);
-      Y = bsxfun(@plus, DataSim.Ys_, -mu);
-      Y = bsxfun(@rdivide, Y, sig);
-      Y = resampleTrials(Y, 1, rng_iter);
-      Yest = tensorDenoiseSVD(mean(Y(:,:,:,1:r1),4,'omitnan'), minrank);
-    case 3
-      Ygt = DataMatched.Ysm_;
-      [Y,mu,sig] = tensorDenoiseStandardize(DataMatched.Ys_);
-      Ygt = bsxfun(@plus, Ygt, -mu);
-      Ygt = bsxfun(@rdivide, Ygt, sig);
-      Y = resampleTrials(Y, 1, rng_iter);
-      Yest = tensorDenoiseSVD(mean(Y(:,:,:,1:r1),4,'omitnan'), minrank);
-  end
+  Ygt = Data.Ysm;
+  Y = resampleTrials(Y, 1, rng_iter);
+  Yest = tensorDenoiseSVD(mean(Y(:,:,:,1:r1),4,'omitnan'), minrank);
   
   err = norm(Ygt(:) - Yest(:)).^2./norm(Ygt(:)).^2;
   

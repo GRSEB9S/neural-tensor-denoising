@@ -1,5 +1,5 @@
-function [ err, err2 ] = tensorDenoiseERR( Y, Yhat, options )
-%TENSORDENOISEMSE Computes MSE of tensors Y and X
+function [ err ] = tensorDenoiseERR( Y, Yhat, options )
+%TENSORDENOISEMSE Computes Error of tensors Y and X
 %   Y is data, Yhat is estimate of data.
 
   %% options struct
@@ -11,7 +11,7 @@ function [ err, err2 ] = tensorDenoiseERR( Y, Yhat, options )
   if ~isfield(options,'errMeasure');
     options.errMeasure = 1; end
   if ~isfield(options,'threshold');
-    options.threshold = 1; end
+    options.threshold = 0; end
 
   %% get options
   perNeuron = options.perNeuron;
@@ -22,13 +22,13 @@ function [ err, err2 ] = tensorDenoiseERR( Y, Yhat, options )
     Yhat = Yhat.*(Yhat>0);
   end
   
-  %% compute relative error
+  %% compute MSE
   Y = Y(:,:);
   Yhat = Yhat(:,:);
   if ~perNeuron    
-    err = 1/length(Y(:))*norm(Y(:)-Yhat(:))^2;
+    err = norm(Y(:)-Yhat(:))^2;
   else
-    err = 1/size(Y(:,:),2)*norm(Y(:,:)-Yhat(:,:)).^2;
+    err = norm(Y(:,:)-Yhat(:,:)).^2;
   end
 
   

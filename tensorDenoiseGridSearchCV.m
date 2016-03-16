@@ -12,20 +12,15 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
     options.gridStep = 1; end
   if ~isfield(options,'r1');
     options.r1 = 10; end
-  if ~isfield(options, 'resample'); % for mixing up trial counts
+  if ~isfield(options, 'resample'); % run resampleTrials()?
     options.resample = 0; end
-  if ~isfield(options, 'verbose');
+  if ~isfield(options, 'verbose'); 
     options.verbose = 1; end
-  if ~isfield(options, 'rng_iter');
+  if ~isfield(options, 'rng_iter'); 
     options.rng_iter = 0; end
-  if ~isfield(options, 'method');
+  if ~isfield(options, 'method'); 
     options.method = 0; end
 
-  %% LOOCV options          
-  [n,t,c,r] = size(Y);
-  Ys = Y;
-  Ysm = mean(Ys,4,'omitnan');
-  
   %% get options
   gridStep = options.gridStep;
   r1 = options.r1;
@@ -36,9 +31,10 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   minRank = options.minRank;
   maxRank = options.maxRank;
   
-  %% svd / define grid search box
-  N = ndims(Ysm);
-  ysize = size(Ysm);
+  %% define set of multilinear ranks to search over
+  Ym = mean(Y,4,'omitnan'); 
+  N = ndims(Ym);
+  ysize = size(Ym);
   
   if method == 0
     in = arrayfun(@(i)minRank(i):gridStep:maxRank(i),1:N,'UniformOutput',false);
@@ -51,30 +47,28 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   end
   
   %% core complexity measures
-  model_elts = @(s)(sum(bsxfun(@times,size(Ysm),s),2)+prod(s,2));
+  model_elts = @(s)(sum(bsxfun(@times,size(Ym),s),2)+prod(s,2));
   core_elts = @(s)(prod(s,2));
   core_sum = @(s)(sum(s,2));
 
-  %% error options
-  erroptions = struct;
-  erroptions.threshold = 1; % usually set to 1
-  erroptions.perNeuron = 0;
-  
-  if verbose;
-  disp('r2 / r1'); end
-
-  % replacement?
+  %% resample trials
   if resample
-    Ys = resampleTrials(Y, 1, r1+1000*rng_iter);
+    Y = resampleTrials(Y, 1, r1+1000*rng_iter);
   end
   
+  %% compute error for each multilinear rank
+  erroptions = struct;
+  erroptions.threshold = 1;
+  erroptions.perNeuron = 0;
   err = zeros(size(out,1), r1);
+
+  if verbose; disp('r2 / r1'); end
   
   for r2 = 1:r1
     if verbose; disp([num2str(r2) ' / ' num2str(r1)]); end
-    Ytrain = Ys(:,:,:,1:r1);
+    Ytrain = Y(:,:,:,1:r1);
     Ytrain(:,:,:,r2) = [];
-    Yval = Ys(:,:,:,r2);
+    Yval = Y(:,:,:,r2);
     for ii = 1:size(out,1)     
       % compute error:
       Yhat = tensorDenoiseSVD(mean(Ytrain, 4, 'omitnan'), out(ii,:));
@@ -102,7 +96,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   
   %Yest = tensorDenoiseSVD(Ysm, minrank);
   
-  %% output -- to do
+  %% output 
   summary.ranks = out;
   summary.model_elts = model_elts(out);
   summary.core_elts = core_elts(out);
@@ -117,60 +111,5 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   summary.minrank_p = minrank_p;
   summary.options = options;
   
-%   %% pareto optimal ranks
-%   function [rnks,x,y] = paretoPoints(rnks, coreMeasure, err)
-%     %% pareto optimal
-%     x = coreMeasure(rnks);
-%     y = err;
-% 
-%     d = sqrt(x.^2+y.^2);
-%     [d,idx] = sort(d);
-%     rnks = rnks(idx,:);
-%     x = x(idx);
-%     y = y(idx);
-% 
-%     p = 1;
-%     while sum(p) <= length(x) % originally it was ~=. now it is <=
-%         idx = (x >= x(p) & y > y(p)) | (x > x(p) & y >= y(p));
-%         if any(idx)
-%             rnks = rnks(~idx,:); x = x(~idx); y = y(~idx); d = d(~idx);
-%         end
-%         p = p+1-sum(idx(1:p));
-%     end
-%     [~,idx] = sortrows([coreMeasure(rnks) -y]);
-%     rnks = rnks(idx,:); x = x(idx); y = y(idx);
-%   end
-
-%   %% resample trials
-%   % to do:
-%   % separate into different function.
-%   function Yout = resampleTrials( Yin, repl )
-%       rng(r1+1000*rng_iter,'twister');
-%       trialCount = getTrialCount(Yin);
-%       for nn = 1:n;
-%         for cc = 1:c
-%           % replacement option 1: with replacement
-%           if repl
-%             trialInds = randi(trialCount(nn,cc), 1, trialCount(nn,cc));
-%           % replacement option 2: without replacement
-%           else
-%             trialInds = randperm(trialCount(nn,cc));
-%           end
-%           Yin(nn,:,cc,1:trialCount(nn,cc)) = Yin(nn,:,cc,trialInds);
-%         end
-%       end
-%       Yout = Yin;
-%   end
-% 
-%   %% get trial count. used in resampleTrials()
-%   function trialOut = getTrialCount(Yin)
-%     [n,t,c,r] = size(Yin);
-%     for nn = 1:n
-%       for cc = 1:c
-%         trialOut(nn,cc) = sum(~isnan(Yin(nn,1,cc,:)));
-%       end
-%     end
-%   end
-
 
 end
