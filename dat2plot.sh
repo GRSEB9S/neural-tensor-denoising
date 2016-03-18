@@ -1,10 +1,10 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l mem=8G,time=18:00:00
+#$ -l mem=8G,time=4:00:00
 #$ -cwd
 #$ -N tensorDenoising
 #$ -j y
-#$ -t 1-200
+#$ -t 1-4
 #$ -o /ifs/scratch/zmbbi/la_lab/jss2219/sge-output/
 #$ -e /ifs/scratch/zmbbi/la_lab/jss2219/sge-error/
 
@@ -17,5 +17,5 @@ echo “Current job ID : $JOB_ID”
 echo “Current job name : $JOB_NAME”
 
 #The following is the job to be performed:
-/nfs/apps/matlab/2015a/bin/matlab -singleCompThread -nojvm -nodisplay -nosplash -r 'tensorDenoiseCluster($SGE_TASK_ID)' >/ifs/scratch/zmbbi/la_lab/jss2219/mat-outfile/matoutfile$SGE_TASK_ID
+/nfs/apps/matlab/2015a/bin/matlab -singleCompThread -nojvm -nodisplay -nosplash -r 'tensorDenoiseDat2Plot($SGE_TASK_ID)' >/ifs/scratch/zmbbi/la_lab/jss2219/mat-outfile/matplot$SGE_TASK_ID
 

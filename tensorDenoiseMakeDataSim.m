@@ -1,12 +1,16 @@
-function Data = tensorDenoiseMakeDataSim(Data, size_core)
+function DataSim = tensorDenoiseMakeDataSim(Data, size_core)
 
+  %% basic params
   bw = 10;
-
-  % get ground truth data
+  sd = 10;
+  [n,t,c,r] = size(Data.Ys);
+  
+  %% get ground truth data
   Ygt = tensorDenoiseSVD(Data.Ysm, size_core);
   %Ygt = filterGauss(Ygt, 2, 2);
   Ygt = Ygt.*(Ygt>0);
 
+  
   % expand in time
   YgtFull = permute(Ygt,[2 1 3]);
   YgtFull = 1/bw*interp1(1:size(YgtFull,1), YgtFull, linspace(1,size(YgtFull,1),bw*size(YgtFull,1)), 'linear', 'extrap');
@@ -22,7 +26,7 @@ function Data = tensorDenoiseMakeDataSim(Data, size_core)
 
   % spike binning
   DataSim.Y = permute(DataSim.Y, [1 3 4 2]);
-  DataSim.Y = sum( reshape(DataSim.Y, [maxn c r_sim t bw]), 5);
+  DataSim.Y = sum( reshape(DataSim.Y, [n c r_sim t bw]), 5);
   DataSim.Y = permute(DataSim.Y, [1 4 2 3]);
 
   % subsample

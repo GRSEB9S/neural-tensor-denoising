@@ -1,93 +1,78 @@
-function tensorDenoiseDat2Plot(datpath)
+function [errPlot, minRankPlot] = tensorDenoiseDat2Plot(datindex)
 % process dat files and make a plot
 % make sure datpath includes '/' at the end
+if nargin == 0 
+  datindex = 1;
+end
+
+if isdir('/ifs/')
+  cd /ifs/scratch/zmbbi/la_lab/jss2219/
+end
+addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
+
+files_r = dir('dat-file*');
+datpath = [files_r(datindex).name '/'];
 
 files = dir(datpath);
 files = files(~[files.isdir]);
 n = length(files);
+load([datpath files(1).name]);
+load(summary.options.refData);
 
-load('mat-files/DataShenoy.mat');
-%load('mat-files/DataSim.mat');
-%load('mat-files/DataMatched.mat');
+if summary.options.simrun
+  for dd = 1:summary.options.n_data
+    D(dd).Data = tensorDenoiseMakeDataSim(Data, summary.options.rnks(dd,:));
+  end
+end
 
+%% get errPlot and minRankPlot 
 % initialize errPlot with nans/ []'s
-
-% replace 'trial' with 'r1' below.
 for nn = 1:n
   load([datpath files(nn).name]);
   
   r1 = summary.options.r1;
   rng_iter = summary.options.rng_iter;
+  method = summary.options.method;
   minrank = summary.minrank;
+  dataset = summary.options.dataset;
   %minrank = summary.minrank_p(20,:);
-  
-  rng_iter = str2double(files(nn).name(5:7));
-  trial = str2double(files(nn).name(9:11));
-  method = str2double(files(nn).name(13));
-  dataset = str2double(files(nn).name(15));
 
-  Ygt = Data.Ysm;
-  Y = resampleTrials(Y, 1, rng_iter);
+  if summary.options.simrun
+    Ygt = D(dataset).Data.Ygt;
+    Y = resampleTrials(D(dataset).Data.Ys, 1, r1+1000*rng_iter);    
+  else
+    Ygt = Data.Ysm;
+    Y = resampleTrials(Data.Ys, 1, r1+1000*rng_iter);
+  end
   Yest = tensorDenoiseSVD(mean(Y(:,:,:,1:r1),4,'omitnan'), minrank);
+  Yest = Yest.*(Yest>0);
   
   err = norm(Ygt(:) - Yest(:)).^2./norm(Ygt(:)).^2;
   
-  errPlot{dataset}(trial-1,method+1,rng_iter+1) = err;
-  minRankPlot{dataset}{method+1}(trial-1,:,rng_iter+1) = table_out.minrank;
+  errPlot{dataset}(r1-1,method+1,rng_iter+1) = err;
+  minRankPlot{dataset}{method+1}(r1-1,:,rng_iter+1) = summary.minrank;
     
 end
 
-%% get average method
-allfiles = vertcat(files(:).name);
-maxrng_iter = max(str2num(allfiles(:,5:7)));
-maxtrial = max(str2num(allfiles(:,9:11)));
-maxmethod = max(str2num(allfiles(:,13)));
-maxdataset = max(str2num(allfiles(:,15)));
+%% average method
+maxrng_iter = summary.options.n_iter;
+maxtrial = summary.options.n_trialcount;
+maxmethod = summary.options.n_method;
+maxdataset = summary.options.n_data;
 
-for r1 = 2:maxtrial
-  for rng_iter = 0:maxrng_iter
-      Ygt = Data.Ysm_;
-      [Y,mu,sig] = tensorDenoiseStandardize(Data.Ys_);
-      Ygt = bsxfun(@plus, Ygt, -mu);
-      Ygt = bsxfun(@rdivide, Ygt, sig);
-      Y = resampleTrials(Y, 1, rng_iter);
-      Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
-      err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
-      errPlot{1}(r1-1,5,rng_iter+1) = err;
-      
-%       [Ygt,mu,sig] = tensorDenoiseStandardize(DataSim.Ygt);
-%       Y = bsxfun(@plus, DataSim.Ys_, -mu);
-%       Y = bsxfun(@rdivide, Y, sig);
-%       Y = resampleTrials(Y, 1, rng_iter);
-%       Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
-%       err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
-%       errPlot{2}(r1-1,5,rng_iter+1) = err;
-      
-%       Ygt = DataMatched.Ysm_;
-%       [Y,mu,sig] = tensorDenoiseStandardize(DataMatched.Ys_);
-%       Ygt = bsxfun(@plus, Ygt, -mu);
-%       Ygt = bsxfun(@rdivide, Ygt, sig);
-%       Y = resampleTrials(Y, r1, rng_iter);
-%       Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
-%       err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
-%       errPlot{3}(trial-1,5,rng_iter+1) = err;
+for dataset = 1:maxdataset
+  for r1 = 2:maxtrial
+    for rng_iter = 0:maxrng_iter
+        Ygt = Data.Ysm;
+        Y = resampleTrials(Data.Ys, 1, r1+1000*rng_iter);
+        Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
+        err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
+        errPlot{dataset}(r1-1,5,rng_iter+1) = err;
+    end
   end
 end
 
-%% plot
-figure; hold all
-xaxis = 2:size(errPlot{1},1)+1;
-plot(xaxis,mean(errPlot{1},3))
-legend('tensor','neuron','time','condition','average');
-xlabel('trials (per neuron per condition)');
-ylabel('relative error');
-title('main analysis | relative error vs trial')
-
-figure; hold all
-plot(xaxis,mean(minRankPlot{1}{1},3))
-legend('neuron','time','condition');
-xlabel('trials (per neuron per condition)');
-ylabel('rank');
-title('main analysis | optimal rank vs trial')
+%% save
+save([datpath 'plotfiles'], 'errPlot','minRankPlot');
 
 end

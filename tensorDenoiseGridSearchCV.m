@@ -87,6 +87,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   minind = find(err_avg == min(err_avg),1);
   minrank = out(minind,:);
   
+  %@todo: fix range to be dataset dependent?
   mrange = 0:100:10000;
   for mm = 1:length(mrange)
     L = err_avg + mrange(mm)*core_elts(out);
