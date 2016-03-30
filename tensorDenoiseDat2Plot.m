@@ -61,10 +61,10 @@ maxmethod = summary.options.n_method;
 maxdataset = summary.options.n_data;
 
 for dataset = 1:maxdataset
-  for r1 = 2:maxtrial
+  for r1 = 2:maxtrial % 
     for rng_iter = 0:maxrng_iter
         Ygt = Data.Ysm;
-        Y = resampleTrials(Data.Ys, 1, r1+1000*rng_iter);
+        Y = resampleTrials(Data.Ys, 1, r1+1000*rng_iter); % probably can put this outside of the loop
         Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
         err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
         errPlot{dataset}(r1-1,5,rng_iter+1) = err;

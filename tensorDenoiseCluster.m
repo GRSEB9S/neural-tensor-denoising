@@ -1,12 +1,13 @@
 function tensorDenoiseCluster(index)
-% generate figure 2 data. for hpc cluster.
+%% generate figure 2 data. for hpc cluster.
 
 options = struct;
 
 %% set options
+options.refData = './mat-files/DataShenoy.mat';
 options.refData = './mat-files/DataLara.mat';
-options.datpath = './dat-file-LaraSim/';
-options.simrun = 1;
+options.datpath = './dat-file-LaraSim-100trials/';
+options.simrun = 0;
 
 % basic gridsearchCV options
 options.gridStep = 5;
@@ -38,11 +39,11 @@ disp(prod(n_vec)) % display index range.
 %% paths 
 if isdir('/ifs/')
   cd /ifs/scratch/zmbbi/la_lab/jss2219/
+  mkdir(options.datpath);
+  addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
 else
   cd /Users/Jeff/Documents/MATLAB/TensorDenoising/
 end
-mkdir(options.datpath);
-addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
 
 load(options.refData);
 
