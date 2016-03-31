@@ -41,9 +41,11 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
     out = cell(1,N);
     [out{:}] = ndgrid(in{:});
     out = cell2mat(cellfun(@(i)i(:),out,'UniformOutput',false)); 
-  else
+  elseif method < 4
     out = repmat(ysize, ysize(method), 1);
     out(:,method) = 1:ysize(method);
+  elseif method == 5
+    out = 05:.01:1;
   end
   
   %% core complexity measures
@@ -61,6 +63,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   erroptions.threshold = 1;
   erroptions.perNeuron = 0;
   err = zeros(size(out,1), r1);
+  size_core = zeros(size(out,1), N);
 
   if verbose; disp('r2 / r1'); end
   
@@ -71,7 +74,7 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
     Yval = Y(:,:,:,r2);
     for ii = 1:size(out,1)     
       % compute error:
-      Yhat = tensorDenoiseSVD(mean(Ytrain, 4, 'omitnan'), out(ii,:));
+      [Yhat, size_core(ii,:)] = tensorDenoiseSVD(mean(Ytrain, 4, 'omitnan'), out(ii,:));
       err(ii,r2) = tensorDenoiseERR( Yval, Yhat, erroptions );
     end
   end
@@ -87,7 +90,8 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   minind = find(err_avg == min(err_avg),1);
   minrank = out(minind,:);
   
-  %@todo: fix range to be dataset dependent?
+  %@todo: fix range to be dataset dependent? get min & max from start and
+  %end points of pareto curve...
   mrange = 0:100:10000;
   for mm = 1:length(mrange)
     L = err_avg + mrange(mm)*core_elts(out);
@@ -98,7 +102,8 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   %Yest = tensorDenoiseSVD(Ysm, minrank);
   
   %% output 
-  summary.ranks = out;
+  summary.out = out;
+  summary.ranks = size_core;
   summary.model_elts = model_elts(out);
   summary.core_elts = core_elts(out);
   summary.core_sum = core_sum(out);

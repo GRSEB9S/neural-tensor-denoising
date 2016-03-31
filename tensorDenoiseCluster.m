@@ -4,14 +4,14 @@ function tensorDenoiseCluster(index)
 options = struct;
 
 %% set options
-options.refData = './mat-files/DataShenoy.mat';
+%options.refData = './mat-files/DataShenoy.mat';
 options.refData = './mat-files/DataLara.mat';
-options.datpath = './dat-file-LaraSim-100trials/';
+options.datpath = './dat-file-Lara-3-30/';
 options.simrun = 0;
 
 % basic gridsearchCV options
-options.gridStep = 5;
-options.minRank = [40 5 5];
+options.gridStep = 2;
+options.minRank = [40 6 6];
 options.maxRank = [80 30 20];
 options.resample = 1;
 options.verbose = 1;
@@ -30,8 +30,8 @@ else
   options.n_data = 1;
 end
 
-options.n_method = 4;
-options.n_trialcount = 10;
+options.n_method = 5;
+options.n_trialcount = 20;
 options.n_iter = 5;
 n_vec = [options.n_iter, options.n_trialcount, options.n_method, options.n_data];
 disp(prod(n_vec)) % display index range. 
