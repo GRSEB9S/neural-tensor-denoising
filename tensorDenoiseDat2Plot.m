@@ -27,6 +27,12 @@ end
 
 %% get errPlot and minRankPlot 
 % initialize errPlot with nans/ []'s
+errPlot = cell(summary.options.n_data, 1);
+errPlot(:) = nan(summary.options.n_trialcount, summary.options.n_method, summary.options.n_iter);
+
+minRankPlot = cell(summary.options.n_data, summary.options.n_method);
+minRankPlot(:) = {nan(summary.options.n_trialcount, size(summary.minrank,2), summary.options.n_iter)};
+
 for nn = 1:n
   load([datpath files(nn).name]);
   
@@ -50,7 +56,7 @@ for nn = 1:n
   err = norm(Ygt(:) - Yest(:)).^2./norm(Ygt(:)).^2;
   
   errPlot{dataset}(r1-1,method+1,rng_iter+1) = err;
-  minRankPlot{dataset}{method+1}(r1-1,:,rng_iter+1) = summary.minrank;
+  minRankPlot{dataset, method+1}(r1-1,:,rng_iter+1) = summary.minrank;
     
 end
 
@@ -67,7 +73,7 @@ for dataset = 1:maxdataset
         Y = resampleTrials(Data.Ys, 1, r1+1000*rng_iter); % probably can put this outside of the loop
         Yest = mean(Y(:,:,:,1:r1),4,'omitnan');
         err = norm(Ygt(:)-Yest(:)).^2./norm(Ygt(:)).^2;
-        errPlot{dataset}(r1-1,5,rng_iter+1) = err;
+        errPlot{dataset}(r1-1,maxmethod+1,rng_iter+1) = err;
     end
   end
 end

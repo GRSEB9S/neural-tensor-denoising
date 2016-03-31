@@ -4,7 +4,7 @@
 #$ -cwd
 #$ -N tensorDenoising
 #$ -j y
-#$ -t 1-200
+#$ -t 1-500
 #$ -o /ifs/scratch/zmbbi/la_lab/jss2219/sge-output/
 #$ -e /ifs/scratch/zmbbi/la_lab/jss2219/sge-error/
 

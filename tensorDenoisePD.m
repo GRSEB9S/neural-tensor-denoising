@@ -8,13 +8,14 @@ Y = Data.Ysm;
 
 %% Load target data
 load('/Users/Jeff/Documents/MATLAB/Datasets/Motor/Lara-20141105/NB.mat');
+
 %% get targ values;
 % note: each N(1), N(2), etc, has a different x,y, coordinate for the
 % targets, but seem to be essentially at the same angle. so as long as we
 % do arctan we should be fine(?)
 targ = zeros(2,c);
 for cc = 1:c
-  targ(1,cc) = N(1).condTable(cc,5).TARGINFO.x/150;
+  targ(1,cc) = N(1).condTable(cc,5).TARGINFO.x/150; % put in sensible range /150.
   targ(2,cc) = N(1).condTable(cc,5).TARGINFO.y/150;
 end
 

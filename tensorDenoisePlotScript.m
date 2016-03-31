@@ -1,6 +1,6 @@
 %% specify
 datindex = 1;
-dataset = 2;
+dataset = 1;
 
 %% load
 files_r = dir('dat-file*');
@@ -25,7 +25,7 @@ hold all
 xaxis = 2:size(errPlot{dataset},1)+1;
 plot(xaxis,mean(errPlot{dataset},3),'linewidth',2);
 ax.YLim(1) = 0;
-legend('tensor','neuron','time','condition','average');
+legend('tensor','neuron','time','condition','tensor (heuristic)','average');
 xlabel('trials (per neuron per condition)');
 ylabel('relative error');
 title('main analysis | relative error vs trial')
@@ -36,9 +36,10 @@ ax = subplot(2,1,2);
 hold all
 plot(xaxis,mean(minRankPlot{dataset}{1},3),'linewidth',2)
 ax.ColorOrderIndex = 1;
-plot(xaxis,mean(minRankPlot{dataset}{2}(:,1,:),3),'--')
-plot(xaxis,mean(minRankPlot{dataset}{3}(:,2,:),3),'--')
-plot(xaxis,mean(minRankPlot{dataset}{4}(:,3,:),3),'--')
+plot(xaxis,mean(minRankPlot{dataset,2}(:,1,:),3),'--')
+plot(xaxis,mean(minRankPlot{dataset,3}(:,2,:),3),'--')
+plot(xaxis,mean(minRankPlot{dataset,4}(:,3,:),3),'--')
+plot(xaxis,mean(minRankPlot{dataset,5},3),'-.');
 
 ax.ColorOrderIndex = 1;
 if summary.options.simrun

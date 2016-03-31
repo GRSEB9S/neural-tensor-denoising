@@ -82,19 +82,19 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
 
   
   %% optimal model -- lots to do
-  [p_out, p_complexity, p_err_avg] = paretoPoints(out, err_avg, core_elts);
+  [p_out, p_complexity, p_err_avg] = paretoPoints(size_core, err_avg, core_elts);
   
   % search through possible slope values:
   % f(x) - mx. find min for different choices of m.
   
   minind = find(err_avg == min(err_avg),1);
-  minrank = out(minind,:);
+  minrank = size_core(minind,:);
   
   %@todo: fix range to be dataset dependent? get min & max from start and
   %end points of pareto curve...
   mrange = 0:100:10000;
   for mm = 1:length(mrange)
-    L = err_avg + mrange(mm)*core_elts(out);
+    L = err_avg + mrange(mm)*core_elts(size_core);
     minind_p(mm,1) = find(L == min(L),1);
     minrank_p(mm,:) = out(minind_p(mm),:);
   end

@@ -6,13 +6,13 @@ options = struct;
 %% set options
 %options.refData = './mat-files/DataShenoy.mat';
 options.refData = './mat-files/DataLara.mat';
-options.datpath = './dat-file-Lara-3-30/';
+options.datpath = './dat-file-Lara-3-31/';
 options.simrun = 0;
 
 % basic gridsearchCV options
-options.gridStep = 2;
+options.gridStep = 4;
 options.minRank = [40 6 6];
-options.maxRank = [80 30 20];
+options.maxRank = [80 30 22];
 options.resample = 1;
 options.verbose = 1;
 
