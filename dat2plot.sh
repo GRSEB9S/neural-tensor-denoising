@@ -1,10 +1,10 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l mem=8G,time=4:00:00
+#$ -l mem=8G,time=1:00:00
 #$ -cwd
-#$ -N tensorDenoising
+#$ -N dat2plot
 #$ -j y
-#$ -t 1-4
+#$ -t 1
 #$ -o /ifs/scratch/zmbbi/la_lab/jss2219/sge-output/
 #$ -e /ifs/scratch/zmbbi/la_lab/jss2219/sge-error/
 

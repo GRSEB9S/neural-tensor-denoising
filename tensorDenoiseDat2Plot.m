@@ -1,14 +1,16 @@
 function [errPlot, minRankPlot] = tensorDenoiseDat2Plot(datindex)
 % process dat files and make a plot
 % make sure datpath includes '/' at the end
+
+%%
 if nargin == 0 
   datindex = 1;
 end
 
 if isdir('/ifs/')
   cd /ifs/scratch/zmbbi/la_lab/jss2219/
+  addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
 end
-addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
 
 files_r = dir('dat-file*');
 datpath = [files_r(datindex).name '/'];
@@ -28,7 +30,7 @@ end
 %% get errPlot and minRankPlot 
 % initialize errPlot with nans/ []'s
 errPlot = cell(summary.options.n_data, 1);
-errPlot(:) = nan(summary.options.n_trialcount, summary.options.n_method, summary.options.n_iter);
+errPlot(:) = {nan(summary.options.n_trialcount, summary.options.n_method, summary.options.n_iter)};
 
 minRankPlot = cell(summary.options.n_data, summary.options.n_method);
 minRankPlot(:) = {nan(summary.options.n_trialcount, size(summary.minrank,2), summary.options.n_iter)};
@@ -67,7 +69,7 @@ maxmethod = summary.options.n_method;
 maxdataset = summary.options.n_data;
 
 for dataset = 1:maxdataset
-  for r1 = 2:maxtrial % 
+  for r1 = 2:maxtrial+1 % 
     for rng_iter = 0:maxrng_iter
         Ygt = Data.Ysm;
         Y = resampleTrials(Data.Ys, 1, r1+1000*rng_iter); % probably can put this outside of the loop

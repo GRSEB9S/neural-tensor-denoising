@@ -14,7 +14,10 @@ sd = 10;
 bw = 10;
 
 %% load Lara data (comment out if not using)
-Lara = preS('/Users/Jeff/Documents/MATLAB/Datasets/Motor/Lara-20141105/Sstructs/', bw, sd);
+
+LaraPath = '/Users/Jeff/Documents/MATLAB/Datasets/Motor/Lara/SstructsA/';
+
+Lara = preS(LaraPath, bw, sd);
 
 Data = tensorizeDataStruct(Lara);
 Data.Ysm = mean(Data.Ys,4,'omitnan');
@@ -43,9 +46,10 @@ Data.trialCount = getTrialCount(Data.Y);
 [~,varSort] = sort(var(Data.Ysm(:,:),[],2),'descend');
 Ystd = std(Data.Ys,[],4,'omitnan'); % is this correct for snr?
 [~,snrSort] = sort(range(Data.Ysm(:,:),2)./mean(Ystd(:,:),2)./sqrt(sum(Data.trialCount,2)),'descend');
+noSort = 1:Data.size(1);
 
 %% sort neurons by one of the above sorts
-sortType = varSort;
+sortType = varSort; % usually do varSort
 
 Data.Y = Data.Y(sortType,:,:,:);
 Data.Ys = Data.Ys(sortType,:,:,:);
@@ -54,7 +58,7 @@ Data.trialCount = Data.trialCount(sortType,:);
 Data.sort = sortType;
 
 %% select top neurons. 
-maxn = 100;
+maxn = min(80, Data.size(1));
 Data.Y = Data.Y(1:maxn,:,:,:);
 Data.Ys = Data.Ys(1:maxn,:,:,:);
 Data.Ysm = Data.Ysm(1:maxn,:,:);

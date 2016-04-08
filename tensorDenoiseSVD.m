@@ -7,7 +7,7 @@ function [ Ysvd, size_core ] = tensorDenoiseSVD( Y, threshold )
     [~,~,sv] = mlsvd(Y);
     loss = cellfun(@(i)cumsum(i(:).^2)/sum(i(:).^2), sv, 'UniformOutput', false);
     for nn = 1:ndims(Y)
-      size_core(nn) = find(loss{nn} > threshold, 1);
+      size_core(nn) = find(loss{nn} >= threshold, 1);
     end
   else
     size_core = threshold;

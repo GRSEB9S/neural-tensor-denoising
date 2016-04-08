@@ -1,8 +1,8 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l mem=8G,time=18:00:00
+#$ -l mem=8G,time=24:00:00
 #$ -cwd
-#$ -N tensorDenoising
+#$ -N td
 #$ -j y
 #$ -t 1-500
 #$ -o /ifs/scratch/zmbbi/la_lab/jss2219/sge-output/

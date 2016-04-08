@@ -44,8 +44,9 @@ function [ summary ] = tensorDenoiseGridSearchCV( Y, options )
   elseif method < 4
     out = repmat(ysize, ysize(method), 1);
     out(:,method) = 1:ysize(method);
-  elseif method == 5
-    out = 05:.01:1;
+  elseif method == 4
+    out = 0.5:.01:1;
+    out = out';
   end
   
   %% core complexity measures
