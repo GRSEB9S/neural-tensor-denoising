@@ -13,21 +13,44 @@ load('/Users/Jeff/Documents/MATLAB/TensorDenoising/mat-files/DataLaraACat')
 % end targlock: 900ms
 % begin movelock: 901ms
 % move: 1400ms (140)
-%
 
-r1a = 3;
+r1a = 5;
 r1b = 20;
 
+%% cut neurons to high-r
 [n,t,c,r] = size(Data.Y);
 [~,varSort] = sort(var(Data.Ysm(:,:),[],2),'descend');
 
+minTrial = min(Data.trialCount,[],2);
+minTrial = minTrial(1:size(Data.Ys,1));
+n_inds = find(minTrial>=10);
+
+Data.trialCount = Data.trialCount(n_inds,:);
+r = max(Data.trialCount(:));
+n = length(n_inds);
+
+Data.Y = Data.Y(n_inds,:,:,1:r);
+Data.Ys = Data.Ys(n_inds,:,:,1:r);
+Data.Ysm = Data.Ysm(n_inds,:,:);
+
+%% resampled trials
+Datax = Data;
+Datax.Y = resampleTrials(Data.Y, 0, 1);
+Datax.Ys = resampleTrials(Data.Ys, 0, 1);
+Datax.Ysm = resampleTrials(Data.Ysm, 0, 1);
+
 %% early trials vs late trials
 Data2 = Data;
+Datax2 = Datax;
 for nn = 1:n
   for cc = 1:c
     Data2.Y(nn,:,cc,1:Data.trialCount(nn,cc)) = Data.Y(nn,:,cc,Data.trialCount(nn,cc):-1:1);
     Data2.Ys(nn,:,cc,1:Data.trialCount(nn,cc)) = Data.Ys(nn,:,cc,Data.trialCount(nn,cc):-1:1);
     Data2.Ysm(nn,:,cc,1:Data.trialCount(nn,cc)) = Data.Ys(nn,:,cc,Data.trialCount(nn,cc):-1:1);
+    
+    Datax2.Y(nn,:,cc,1:Data.trialCount(nn,cc)) = Datax.Y(nn,:,cc,Data.trialCount(nn,cc):-1:1);
+    Datax2.Ys(nn,:,cc,1:Data.trialCount(nn,cc)) = Datax.Ys(nn,:,cc,Data.trialCount(nn,cc):-1:1);
+    Datax2.Ysm(nn,:,cc,1:Data.trialCount(nn,cc)) = Datax.Ys(nn,:,cc,Data.trialCount(nn,cc):-1:1);
   end
 end
 
@@ -69,32 +92,63 @@ options.method = 0;
 % summaryc = tensorDenoiseGridSearchCV(Data2.Ys, options);
 
 %% denoise
+mlr = [20 10 10];
+filt = 3;
+
 % Yhata = tensorDenoiseSVD(Data.Ysm(:,:,:,1:r1a), summarya.minrank);
 % Yhatb = tensorDenoiseSVD(Data.Ysm(:,:,:,1:r1b), summaryb.minrank);
 % Yhatc = tensorDenoiseSVD(Data2.Ysm(:,:,:,1:r1a), summaryc.minrank);
 
-Yhat{1} = filterGauss(mean(Data.Ys(:,:,:,1:r1a),4,'omitnan'),3,2);
-Yhat{2} = filterGauss(mean(Data.Ys(:,:,:,1:r1b),4,'omitnan'),3,2);
-Yhat{3} = filterGauss(mean(Data2.Ys(:,:,:,1:r1a),4,'omitnan'),3,2);
+Yhat{1} = filterGauss(mean(Data.Ys,4,'omitnan'),filt,2);
 
-Yhat{4} = tensorDenoiseSVD(mean(Data.Ys(:,:,:,1:r1a),4,'omitnan'), [20 10 5]);
-Yhat{5} = tensorDenoiseSVD(mean(Data.Ys(:,:,:,1:r1b),4,'omitnan'), [20 10 5]);
-Yhat{6} = tensorDenoiseSVD(mean(Data2.Ys(:,:,:,1:r1a),4,'omitnan'), [20 10 5]);
+Yhat{2} = filterGauss(mean(Data.Ys(:,:,:,1:r1a),4,'omitnan'),filt,2);
+Yhat{3} = filterGauss(mean(Data2.Ys(:,:,:,1:r1a),4,'omitnan'),filt,2);
 
-Yhat{7} = filterGauss(Data.Ysm, 3, 2);
+Yhat{4} = filterGauss(mean(Datax.Ys(:,:,:,1:r1a),4,'omitnan'),filt,2);
+Yhat{5} = filterGauss(mean(Datax2.Ys(:,:,:,1:r1a),4,'omitnan'),filt,2);
+
+Yhat{6} = tensorDenoiseSVD(mean(Data.Ys(:,:,:,1:r1a),4,'omitnan'), mlr);
+Yhat{7} = tensorDenoiseSVD(mean(Data2.Ys(:,:,:,1:r1a),4,'omitnan'), mlr);
+
+Yhat{8} = tensorDenoiseSVD(mean(Datax.Ys(:,:,:,1:r1a),4,'omitnan'), mlr);
+Yhat{9} = tensorDenoiseSVD(mean(Datax2.Ys(:,:,:,1:r1a),4,'omitnan'), mlr);
+
+datasets = {...
+            'all trials',...
+            'avg, first block',...
+            'avg, last block',...
+            'avg, rand first block',...
+            'avg, rand last block',...
+            'tensor, first block',...
+            'tensor, last block',...
+            'tensor, rand first block',...
+            'tensor, rand last block',...
+            };
+
+%% get tuning strength
+ts = [];
+for yy = 1:length(Yhat)
+  ts(:,:,yy) = var(Yhat{yy}, 0, 3);
+end
+%% plot tuning
+dplot = [1 6 7];
+n_inds = [2 5 6 7 8 9 11 13 16 17 18 20 21 23];
+tensorSubplot(ts(n_inds, :, dplot), 4,2,'csort',0);
 
 %% get PD
-for yy = 1:7
+pd = [];
+for yy = 1:length(Yhat)
   pd(:,:,yy) = tensorDenoiseGetPD(Yhat{yy}, targ);
 end
 
 %% plot
 % good inds for DataLaraA:
-n_inds = [2 5 6 7 8 9 11 13 16 17 18 20 21 23];
+%n_inds = [2 5 6 7 8 9 11 13 16 17 18 20 21 23];
 %n_inds = 1:20;
 
-cplot = [1 4 7];
-h = tensorSubplot(pd(n_inds,:,cplot),4,2,'csort',0);
+dplot = [1 4 7];
+tensorSubplot(ts(n_inds, :, dplot), 4,2,'csort',0);
+h = tensorSubplot(pd(n_inds,:,dplot),4,2,'csort',0);
 xlabel('time');
 ylabel('PD (degrees)');
 for aa = 1:length(h.Children)
@@ -107,14 +161,74 @@ end
 % begin movelock: 901ms
 % move: 1400ms (140)
 
-legend({'avg+filter, first 3 trials','tensor denoise first 3 trials','avg+filter, all trials (~ ground truth)'});
+legend(datasets{dplot});
 
-%legend({'average (10ms filter)', 'average (+50ms filter)', 'tensor denoised (CV rank)', 'tensor denoised (oversmoothed)'});
-h = tensorSubplot(Yhat{7}(n_inds,:,:),4,2);
+h = tensorSubplot(Yhat{1}(n_inds,:,:),4,2);
 for aa = 1:length(h.Children)
   h.Children(aa).XTick = [40 140];
   h.Children(aa).XTickLabel = {'on','move'};
 end
 
-%%
+%% some analysis... find strongest tuned part of psth
+tuneTime = [];
+timeRange = 120:180;
+yref = 1;
+for nn = 1:n
+  for yy = 1:length(Yhat)
+    [~,tuneTime(nn,yy)] = max(ts(nn,timeRange,yy));
+  end
+end
+tuneTime = tuneTime + timeRange(1) - 1;
+
+%% calculate pd diff
+yref = ones(length(Yhat),1);
+yref = [1 3 3 5 5 7 7 9 9];
+
+for nn = 1:n
+  for yy = 1:length(Yhat)
+    pddiff_(nn,yy) = pd(nn,tuneTime(nn,yref(yy)),yy) - pd(nn,tuneTime(nn,yref(yy)),yref(yy));
+  end
+end
+pddiff = min(abs(pddiff_), 360 - abs(pddiff_));
+
+%% get varsort
+for nn = 1:n
+  tssort(nn) = ts(nn,tuneTime(nn,yref(1)),yref(1));
+end
+[~,varsort] = sort(tssort,'descend');
+varsort = varsort(1:50);
+meanpddiff = mean(pddiff);
+
+%% plot
+dplot = [2 4 6 8];
+h=figure;
+plot(pddiff(varsort,dplot));
+hold all
+h.Children(1).ColorOrderIndex = 1;
+for dd = 1:length(dplot)
+  plot([1 50], [meanpddiff(dplot(dd)) meanpddiff(dplot(dd))])
+end
+legend(datasets{dplot});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
