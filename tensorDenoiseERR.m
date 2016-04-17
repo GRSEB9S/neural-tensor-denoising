@@ -28,7 +28,7 @@ function [ err ] = tensorDenoiseERR( Y, Yhat, options )
   if ~perNeuron    
     err = norm(Y(:)-Yhat(:))^2;
   else
-    err = norm(Y(:,:)-Yhat(:,:)).^2;
+    err = norm(Y(:,:)-Yhat(:,:)).^2; % replace wtih sum(_^2,2)
   end
 
   
