@@ -15,7 +15,10 @@ bw = 10;
 
 %% load Lara data (comment out if not using)
 
-LaraPath = '/Users/Jeff/Documents/MATLAB/Datasets/Motor/Lara/SstructsA/';
+%LaraPath = '/Users/Jeff/Documents/MATLAB/Datasets/Motor/Lara/SstructsA/';
+%LaraPath = '/Volumes/Pegasus/antonio/A/emgData/Sstructs/';
+LaraPath = '/Volumes/Pegasus/antonio/B/emgData/Sstructs/';
+
 
 Lara = preS(LaraPath, bw, sd);
 
@@ -70,7 +73,7 @@ Data.Ys = bsxfun(@rdivide, Data.Ys, div);
 Data.div = div;
 
 %% save
-save('/Users/Jeff/Documents/MATLAB/TensorDenoising/mat-files/Data.mat','Data');
+save('/Users/jeff/Documents/MATLAB/TensorDenoising/mat-files/Data.mat','Data');
 
 end
 
