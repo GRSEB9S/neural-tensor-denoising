@@ -1,4 +1,4 @@
-function tensorDenoiseCluster(index)
+function tensorDenoiseClusterAsim(index)
 %% generate figure 2 data. for hpc cluster.
 
 options = struct;
@@ -11,7 +11,7 @@ options.simrun = 1;
 
 % basic gridsearchCV options
 options.gridStep = 4;
-options.minRank = [40 6 6];
+options.minRank = [20 2 2];
 options.maxRank = [80 30 22];
 options.resample = 1;
 options.verbose = 1;

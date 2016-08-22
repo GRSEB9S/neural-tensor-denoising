@@ -1,17 +1,17 @@
-function tensorDenoiseCluster(index)
+function tensorDenoiseClusterBsim(index)
 %% generate figure 2 data. for hpc cluster.
 
 options = struct;
 
 %% set options
 %options.refData = './mat-files/DataShenoy.mat';
-options.refData = './mat-files/DataLaraA.mat';
-options.datpath = './dat-file-Lara-8-17-Asim/';
+options.refData = './mat-files/DataLaraB.mat';
+options.datpath = './dat-file-Lara-8-17-Bsim/';
 options.simrun = 1;
 
 % basic gridsearchCV options
 options.gridStep = 4;
-options.minRank = [40 6 6];
+options.minRank = [20 2 2];
 options.maxRank = [80 30 22];
 options.resample = 1;
 options.verbose = 1;

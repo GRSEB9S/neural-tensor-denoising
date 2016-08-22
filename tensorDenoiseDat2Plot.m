@@ -10,6 +10,9 @@ end
 if isdir('/ifs/')
   cd /ifs/scratch/zmbbi/la_lab/jss2219/
   addpath(genpath('/ifs/scratch/zmbbi/la_lab/jss2219/'))
+elseif isdir('/vega/')
+  cd /vega/zmbbi/users/jss2219/TensorDenoising/
+  addpath(genpath('/vega/zmbbi/users/jss2219/TensorDenoising/'))
 end
 
 files_r = dir('dat-file*');

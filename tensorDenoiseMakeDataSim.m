@@ -18,7 +18,7 @@ function DataSim = tensorDenoiseMakeDataSim(Data, size_core)
   YgtFull = YgtFull.*(YgtFull>0);
 
   % simulate spikes
-  r_sim = 20;
+  r_sim = 30;
   rng(42);
   DataSim.Y = poissrnd(mean(1/bw*Data.Y(:),'omitnan')/mean(YgtFull(:))*repmat(YgtFull,1,1,1,r_sim));
   DataSim.Ys = filterGauss(DataSim.Y, sd, 2);
